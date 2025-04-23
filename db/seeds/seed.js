@@ -94,7 +94,6 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     })
     .then((result) => {
       const lookupObject = createRef(result.rows);
-      console.log(lookupObject, "lookup Obj");
       const formattedCommentData = commentData.map((comment) => {
         const convertedComment = convertTimestampToDate(comment);
         return [
@@ -105,7 +104,6 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
           convertedComment.created_at,
         ];
       });
-      console.log(formattedCommentData, "formatted comments");
       const insertIntoCommentQuery = format(
         `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L`,
         formattedCommentData
