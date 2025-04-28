@@ -141,6 +141,14 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test("200: Comments are ordered with most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
   test("200: Article exists but there are no comments, receives empty array", () => {
     return request(app)
       .get("/api/articles/10/comments")
