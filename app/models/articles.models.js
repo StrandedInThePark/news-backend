@@ -32,7 +32,7 @@ const selectAllArticles = () => {
 
           LEFT JOIN commentCountInfo 
           ON mainCommentsInfo.article_id = commentCountInfo.article_id
-          ORDER BY created_at ASC
+          ORDER BY created_at DESC
             `
     )
     .then(({ rows }) => {

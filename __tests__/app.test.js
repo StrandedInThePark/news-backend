@@ -113,4 +113,13 @@ describe("GET /api/articles", () => {
         );
       });
   });
+  test("200: Array is ordered by ascending date of article creation", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        console.log(articles, "articles");
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
 });
