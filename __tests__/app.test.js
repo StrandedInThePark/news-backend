@@ -30,7 +30,6 @@ describe("GET /* all other urls", () => {
       .get("/api/non-existent-endpoint")
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         expect(body.msg).toBe("Invalid URL!");
       });
   });
@@ -142,8 +141,30 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
-  describe.skip("Errors", () => {
-    test.todo("INVALID ARTICLE ID");
-    test.todo("NONEXISTENT ARTICLE ID");
+  test("200: Article exists but there are no comments, receives empty array", () => {
+    return request(app)
+      .get("/api/articles/10/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([]);
+      });
+  });
+  describe("Errors", () => {
+    test("400: Invalid article ID; not a number", () => {
+      return request(app)
+        .get("/api/articles/not-a-number/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("404: Non-existent article ID; valid request", () => {
+      return request(app)
+        .get("/api/articles/1313/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
   });
 });
