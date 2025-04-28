@@ -24,13 +24,31 @@ describe("GET /api", () => {
   });
 });
 
-describe.only("GET /* all other urls", () => {
+describe("GET /* all other urls", () => {
   test("404: Responds with invalid URL for anything else not caught by other endpoints", () => {
     return request(app)
       .get("/api/non-existent-endpoint")
       .expect(404)
       .then(({ body }) => {
+        console.log(body);
         expect(body.msg).toBe("Invalid URL!");
+      });
+  });
+});
+
+describe.only("GET /api/topics", () => {
+  test("200: Responds with an array of all topics with slug and description", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body: { topics } }) => {
+        expect(topics.length).toBe(3);
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
+        });
       });
   });
 });
