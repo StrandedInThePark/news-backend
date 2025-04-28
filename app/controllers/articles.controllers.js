@@ -14,7 +14,7 @@ const getArticleByArticleId = (req, res, next) => {
 
 const getAllArticles = (req, res, next) => {
   return selectAllArticles().then((articles) => {
-    console.log(articles, "articles");
+    res.status(200).send({ articles });
   });
 };
 

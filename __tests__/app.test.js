@@ -100,18 +100,16 @@ describe.only("GET /api/articles", () => {
       .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(13);
         articles.forEach((article) =>
-          expect(
-            article.toMatchObject({
-              author: expect.any(String),
-              title: expect.any(String),
-              article_id: expect.any(Number),
-              topic: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              article_img_url: expect.any(String),
-              comment_count: expect.any(Number),
-            })
-          )
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
         );
       });
   });
