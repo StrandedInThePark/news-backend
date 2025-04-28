@@ -37,7 +37,7 @@ describe("GET /* all other urls", () => {
 });
 
 describe.only("GET /api/topics", () => {
-  test("200: Responds with all topics with slug and description", () => {
+  test("200: Responds with an array of all topics with slug and description", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -51,5 +51,4 @@ describe.only("GET /api/topics", () => {
         });
       });
   });
-  test.todo("");
 });
