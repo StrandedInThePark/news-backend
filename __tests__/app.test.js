@@ -118,8 +118,32 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        console.log(articles, "articles");
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Retrieves all comments for specified article, in an array", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(2);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  describe.skip("Errors", () => {
+    test.todo("INVALID ARTICLE ID");
+    test.todo("NONEXISTENT ARTICLE ID");
   });
 });
