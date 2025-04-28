@@ -53,7 +53,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: Responds with an article object for given article id", () => {
     return request(app)
       .get("/api/articles/3")
@@ -72,6 +72,22 @@ describe.only("GET /api/articles/:article_id", () => {
         });
       });
   });
-  test.todo("404 valid article_id that does not exist");
-  test.todo("400 invalid id - i.e. string");
+  describe("Errors", () => {
+    test("404: Valid id that does not exist", () => {
+      return request(app)
+        .get("/api/articles/2000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test.only("400: Invalid id; not a number", () => {
+      return request(app)
+        .get("/api/articles/not-a-number")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+  });
 });
