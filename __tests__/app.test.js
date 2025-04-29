@@ -394,7 +394,6 @@ describe.only("GET /api/comments/:comment_id", () => {
       .get("/api/comments/2")
       .expect(200)
       .then(({ body: { comment } }) => {
-        console.log(comment, "comment");
         expect(comment).toMatchObject({
           comment_id: 2,
           article_id: 1,
@@ -404,5 +403,23 @@ describe.only("GET /api/comments/:comment_id", () => {
           created_at: "2020-10-31T03:03:00.000Z",
         });
       });
+  });
+  describe("Errors", () => {
+    test("404: Comment_id does not exist", () => {
+      return request(app)
+        .get("/api/comments/2000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test("400: Invalid comment_id", () => {
+      return request(app)
+        .get("/api/comments/invalidCommentId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
   });
 });
