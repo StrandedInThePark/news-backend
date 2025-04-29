@@ -178,7 +178,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test.only("200: Adds comment to the specified article", () => {
+  test("200: Adds comment to the specified article", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
@@ -195,7 +195,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           });
       });
   });
-  test.only("200: Returns the comment", () => {
+  test("200: Returns the comment", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
@@ -214,7 +214,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  describe.only("Errors", () => {
+  describe("Errors", () => {
     test("404: Specified article does not yet exist", () => {
       return request(app)
         .post("/api/articles/302/comments")
@@ -233,6 +233,19 @@ describe("POST /api/articles/:article_id/comments", () => {
         .send({
           username: "lurker",
           body: "Has anyone heard the rumours?",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("400: Too many keys", () => {
+      return request(app)
+        .post("/api/articles/invalidArticleId/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+          testKey: "testValue",
         })
         .expect(400)
         .then(({ body: { msg } }) => {
