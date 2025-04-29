@@ -177,15 +177,15 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("POST /api/articles/:article_id/comments", () => {
-  test("200: Adds comment to the specified article", () => {
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("201: Adds comment to the specified article", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
         username: "lurker",
         body: "Has anyone heard the rumours?",
       })
-      .expect(200)
+      .expect(201)
       .then(() => {
         return request(app)
           .get("/api/articles/3/comments")
@@ -195,14 +195,14 @@ describe("POST /api/articles/:article_id/comments", () => {
           });
       });
   });
-  test("200: Returns the comment", () => {
+  test("201: Returns the comment", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
         username: "lurker",
         body: "Has anyone heard the rumours?",
       })
-      .expect(200)
+      .expect(201)
       .then(({ body: { newComment } }) => {
         expect(newComment).toMatchObject({
           comment_id: 19,
