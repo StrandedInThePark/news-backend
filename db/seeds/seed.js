@@ -75,7 +75,6 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       //uses util to convert created_at to correct format - leaves other values as they were
       const formattedArticleData = articleData.map((article) => {
         const correctArticle = convertTimestampToDate(article);
-        // console.log(correctArticles, "corrected");
         return [
           correctArticle.title,
           correctArticle.topic,
