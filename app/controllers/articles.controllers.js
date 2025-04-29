@@ -21,10 +21,23 @@ const getAllArticles = (req, res, next) => {
 
 const patchVotesOnArticle = (req, res, next) => {
   const { inc_votes } = req.body;
+  if (inc_votes === 0) {
+    return Promise.reject({ status: 422, msg: "Unprocessable entity!" });
+  }
+  if (!inc_votes) {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
   const { article_id } = req.params;
-  return updateVotesOnArticle(inc_votes, article_id).then((updatedArticle) => {
-    res.status(200).send({ updatedArticle });
-  });
+  const pendingSelectArticleById = selectArticleByArticleId(article_id);
+  const pendingUpdateVotesOnArticle = updateVotesOnArticle(
+    inc_votes,
+    article_id
+  );
+  return Promise.all([pendingUpdateVotesOnArticle, pendingSelectArticleById])
+    .then(([updatedArticle]) => {
+      res.status(200).send({ updatedArticle });
+    })
+    .catch(next);
 };
 
 module.exports = { getArticleByArticleId, getAllArticles, patchVotesOnArticle };
