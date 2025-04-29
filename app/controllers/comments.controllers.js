@@ -18,13 +18,13 @@ const getCommentsByArticleId = (req, res, next) => {
 const postCommentToArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
-  const pendingArticleById = selectArticleByArticleId(article_id);
+  const pendingSelectArticleById = selectArticleByArticleId(article_id);
   const pendingInsertCommentsById = insertCommentToArticle(
     article_id,
     username,
     body
   );
-  Promise.all([pendingInsertCommentsById, pendingArticleById])
+  Promise.all([pendingInsertCommentsById, pendingSelectArticleById])
     .then(([newComment]) => {
       res.status(200).send({ newComment });
     })

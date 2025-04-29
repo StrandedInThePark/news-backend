@@ -224,7 +224,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(404)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Not found!");
+          expect(msg).toBe("Not found!");
         });
     });
     test("400: Invalid article id used", () => {
@@ -236,7 +236,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Invalid request!");
+          expect(msg).toBe("Invalid request!");
         });
     });
     test("400: Too many keys", () => {
@@ -249,7 +249,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Invalid request!");
+          expect(msg).toBe("Invalid request!");
         });
     });
     test("400: Not all keys present in comment object", () => {
@@ -260,7 +260,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Invalid request!");
+          expect(msg).toBe("Invalid request!");
         });
     });
     test("400: Body of message is empty", () => {
@@ -272,7 +272,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Invalid request!");
+          expect(msg).toBe("Invalid request!");
         });
     });
     test("401: Username does not exist - no account created", () => {
@@ -284,8 +284,79 @@ describe("POST /api/articles/:article_id/comments", () => {
         })
         .expect(401)
         .then(({ body: { msg } }) => {
-          expect(msg).toEqual("Unauthorised request!");
+          expect(msg).toBe("Unauthorised request!");
         });
     });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Updates specified article with new vote count", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -13 })
+      .expect(200)
+      .then(({ body: { updatedArticle } }) => {
+        console.log(updatedArticle, "updatedArticle");
+        expect(updatedArticle).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 87,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: No article exists with article_id requested", () => {
+      return request(app)
+        .patch("/api/articles/500")
+        .send({ inc_votes: -13 })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+  });
+  test("400: Invalid article id used", () => {
+    return request(app)
+      .patch("/api/articles/invalidArticleId")
+      .send({ inc_votes: -13 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid request!");
+      });
+  });
+
+  test("400: Invalid vote modifier sent", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "cat" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid request!");
+      });
+  });
+  test("400: Incorrect key in patch request object", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ wrong_key: 5 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid request!");
+      });
+  });
+  test("422: Vote modifier of 0 sent; client alerted to unprocessable entity", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 0 })
+      .expect(422)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Unprocessable entity!");
+      });
   });
 });
