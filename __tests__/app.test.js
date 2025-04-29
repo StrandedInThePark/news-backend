@@ -177,7 +177,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("201: Adds comment to the specified article", () => {
     return request(app)
       .post("/api/articles/3/comments")
@@ -214,6 +214,26 @@ describe.only("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
+  test.only("201: Comment posted if object has too many keys, but includes correct keys", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "lurker",
+        body: "Has anyone heard the rumours?",
+        testKey: "testValue",
+      })
+      .expect(201)
+      .then(({ body: { newComment } }) => {
+        expect(newComment).toMatchObject({
+          comment_id: 19,
+          article_id: 3,
+          author: "lurker",
+          body: "Has anyone heard the rumours?",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
   describe("Errors", () => {
     test("404: Specified article does not yet exist", () => {
       return request(app)
@@ -233,19 +253,6 @@ describe.only("POST /api/articles/:article_id/comments", () => {
         .send({
           username: "lurker",
           body: "Has anyone heard the rumours?",
-        })
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Invalid request!");
-        });
-    });
-    test("400: Too many keys", () => {
-      return request(app)
-        .post("/api/articles/invalidArticleId/comments")
-        .send({
-          username: "lurker",
-          body: "Has anyone heard the rumours?",
-          testKey: "testValue",
         })
         .expect(400)
         .then(({ body: { msg } }) => {
