@@ -454,3 +454,92 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("GET /api/articles?sort_by query", () => {
+  describe("Default sorting", () => {
+    test("Default endpoint sorts by created_at date, in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          //descending: newest date first
+        });
+    });
+    describe("Specified categories to sort by", () => {
+      test("created_at specified", () => {
+        return request(app)
+          .get("/api/articles?sort_by=created_at")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+    });
+    test("votes specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        });
+    });
+    test("topic specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("topic", { descending: true });
+        });
+    });
+    test("author specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("author", { descending: true });
+        });
+    });
+    test("title specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("title", { descending: true });
+        });
+    });
+  });
+  describe("Order to sort by specified order", () => {
+    test("default sort_by category but asc order specified", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
+    test("sort_by specified and asc order specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("votes", { ascending: true });
+        });
+    });
+    test("sort_by specified and desc order specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=desc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("title", { descending: true });
+        });
+    });
+  });
+
+  describe("Errors", () => {
+    test.todo("invalid sort_by category - exists but not allowed (url)");
+    test.todo("invalid sort_by category - does not exist");
+    test.todo("invalid order request");
+    /////ADD TO ENDPOINT JSON QUERIES
+  });
+});
