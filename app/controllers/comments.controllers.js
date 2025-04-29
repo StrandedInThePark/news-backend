@@ -35,11 +35,9 @@ const postCommentToArticle = (req, res, next) => {
 
 const deleteCommentByCommentId = (req, res, next) => {
   const { comment_id } = req.params;
-
   const pendingSelectCommentByCommentId = selectCommentByCommentId(comment_id);
   const pendingModelDeleteCommentByCommentId =
     modelDeleteCommentByCommentId(comment_id);
-
   Promise.all([
     pendingModelDeleteCommentByCommentId,
     pendingSelectCommentByCommentId,

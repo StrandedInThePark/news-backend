@@ -374,7 +374,6 @@ describe.only("DELETE /api/comments/:comment_id", () => {
           });
       });
   });
-
   describe("Errors", () => {
     test("404: Comment_id is valid but does not exist", () => {
       return request(app)
@@ -384,7 +383,14 @@ describe.only("DELETE /api/comments/:comment_id", () => {
           expect(msg).toBe("Not found!");
         });
     });
-    test.todo("invalid comment id");
+    test("400: Invalid comment_id used", () => {
+      return request(app)
+        .delete("/api/comments/invalidCommentId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
   });
 });
 
