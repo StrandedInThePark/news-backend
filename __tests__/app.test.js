@@ -176,3 +176,116 @@ describe("GET /api/articles/:article_id/comments", () => {
     });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("200: Adds comment to the specified article", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "lurker",
+        body: "Has anyone heard the rumours?",
+      })
+      .expect(200)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/3/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toHaveLength(3);
+          });
+      });
+  });
+  test("200: Returns the comment", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "lurker",
+        body: "Has anyone heard the rumours?",
+      })
+      .expect(200)
+      .then(({ body: { newComment } }) => {
+        expect(newComment).toMatchObject({
+          comment_id: 19,
+          article_id: 3,
+          author: "lurker",
+          body: "Has anyone heard the rumours?",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Specified article does not yet exist", () => {
+      return request(app)
+        .post("/api/articles/302/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+        })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Not found!");
+        });
+    });
+    test("400: Invalid article id used", () => {
+      return request(app)
+        .post("/api/articles/invalidArticleId/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("400: Too many keys", () => {
+      return request(app)
+        .post("/api/articles/invalidArticleId/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+          testKey: "testValue",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("400: Not all keys present in comment object", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "lurker",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("400: Body of message is empty", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "lurker",
+          body: "",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("401: Username does not exist - no account created", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "Springsteen49",
+          body: "Hey guys, I've announced 7 lost albums in June, head over to BTX for a laugh.",
+        })
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Unauthorised request!");
+        });
+    });
+  });
+});
