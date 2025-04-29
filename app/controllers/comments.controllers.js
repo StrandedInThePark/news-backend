@@ -28,7 +28,7 @@ const postCommentToArticle = (req, res, next) => {
   );
   Promise.all([pendingInsertCommentsById, pendingSelectArticleById])
     .then(([newComment]) => {
-      res.status(200).send({ newComment });
+      res.status(201).send({ newComment });
     })
     .catch(next);
 };
