@@ -30,24 +30,32 @@ const selectAllArticles = (sort_by, order) => {
 
           LEFT JOIN commentCountInfo 
           ON mainCommentsInfo.article_id = commentCountInfo.article_id`;
-  let queryArgs = [];
-  let queryCount = 0;
   const sortByGreenlist = ["created_at", "votes", "topic", "author", "title"];
   const orderGreenlist = ["asc", "desc"];
-
+  const sortByRedlist = ["body", "article_img_url"];
+  //sort_by handling
   if (!sort_by) {
     queryStr += ` ORDER BY created_at`;
   }
   if (sort_by && sortByGreenlist.includes(sort_by)) {
     queryStr += ` ORDER BY ${sort_by}`;
   }
+  if (sort_by && sortByRedlist.includes(sort_by)) {
+    return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+  }
+  if ((sort_by && !sortByGreenlist.includes(sort_by)) || sort_by === "") {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
+  //order handling
   if (!order) {
     queryStr += ` DESC`;
   }
   if (order && orderGreenlist.includes(order)) {
     queryStr += ` ${order}`;
   }
-  console.log(queryStr, "query string");
+  if ((order && !orderGreenlist.includes(order)) || order === "") {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
   return db.query(queryStr).then(({ rows: articles }) => {
     return articles;
   });
