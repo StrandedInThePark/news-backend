@@ -36,8 +36,17 @@ const modelDeleteCommentByCommentId = (commentId) => {
   ]);
 };
 
+const selectCommentByCommentId = (commentId) => {
+  return db
+    .query(`SELECT * FROM comments WHERE comment_id = $1`, [commentId])
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
 module.exports = {
   selectCommentsByArticleId,
   insertCommentToArticle,
   modelDeleteCommentByCommentId,
+  selectCommentByCommentId,
 };

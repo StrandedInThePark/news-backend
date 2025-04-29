@@ -360,7 +360,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe.only("DELETE /api/comments/:comment_id", () => {
+describe("DELETE /api/comments/:comment_id", () => {
   test("200: Deletes specified comment", () => {
     return request(app)
       .delete("/api/comments/2")
@@ -375,8 +375,34 @@ describe.only("DELETE /api/comments/:comment_id", () => {
       });
   });
 
-  describe.skip("Errors", () => {
-    test.todo("nonexistent comment id");
+  describe("Errors", () => {
+    test("404: Comment_id is valid but does not exist", () => {
+      return request(app)
+        .delete("/api/comments/203")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
     test.todo("invalid comment id");
+  });
+});
+
+describe.only("GET /api/comments/:comment_id", () => {
+  test("200: Returns specified comment", () => {
+    return request(app)
+      .get("/api/comments/2")
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        console.log(comment, "comment");
+        expect(comment).toMatchObject({
+          comment_id: 2,
+          article_id: 1,
+          body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          votes: 14,
+          author: "butter_bridge",
+          created_at: "2020-10-31T03:03:00.000Z",
+        });
+      });
   });
 });
