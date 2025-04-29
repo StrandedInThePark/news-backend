@@ -360,7 +360,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe("DELETE /api/comments/:comment_id", () => {
+describe.only("DELETE /api/comments/:comment_id", () => {
   test("200: Deletes specified comment", () => {
     return request(app)
       .delete("/api/comments/2")
@@ -388,7 +388,7 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-describe.only("GET /api/comments/:comment_id", () => {
+describe("GET /api/comments/:comment_id", () => {
   test("200: Returns specified comment", () => {
     return request(app)
       .get("/api/comments/2")
