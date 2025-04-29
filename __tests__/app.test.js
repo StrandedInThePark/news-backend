@@ -178,7 +178,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test.only("200: Adds comment to the specific article", () => {
+  test.only("200: Adds comment to the specified article", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
@@ -214,10 +214,33 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  describe.skip("ERROR TESTS", () => {
-    test.todo("specified article does not exist");
-    test.todo("not all keys present in comment object?");
+  describe("Errors", () => {
+    test.only("404: Specified article does not yet exist", () => {
+      return request(app)
+        .post("/api/articles/302/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+        })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Not found!");
+        });
+    });
+    test.only("400: Invalid article id used", () => {
+      return request(app)
+        .post("/api/articles/invalidArticleId/comments")
+        .send({
+          username: "lurker",
+          body: "Has anyone heard the rumours?",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test.todo("400: Not all keys present in comment object?");
     test.todo("nothing in comment - reject");
-    test.todo("username does not exist");
+    test.todo("username does not exist - unauthorized 401?");
   });
 });

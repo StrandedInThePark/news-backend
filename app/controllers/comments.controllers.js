@@ -24,11 +24,11 @@ const postCommentToArticle = (req, res, next) => {
     username,
     body
   );
-  Promise.all([pendingInsertCommentsById, pendingArticleById]).then(
-    ([newComment]) => {
+  Promise.all([pendingInsertCommentsById, pendingArticleById])
+    .then(([newComment]) => {
       res.status(200).send({ newComment });
-    }
-  );
+    })
+    .catch(next);
 };
 
 module.exports = { getCommentsByArticleId, postCommentToArticle };
