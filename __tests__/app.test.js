@@ -454,3 +454,129 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("GET /api/articles?sort_by query", () => {
+  describe("Default sorting", () => {
+    test("200: Default endpoint sorts by created_at date, in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          //descending: newest date first
+        });
+    });
+    describe("Specified categories to sort by", () => {
+      test("200: Created_at sort specified", () => {
+        return request(app)
+          .get("/api/articles?sort_by=created_at")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+    });
+    test("200: Votes sort specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        });
+    });
+    test("200: Topic sort specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=topic")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("topic", { descending: true });
+        });
+    });
+    test("200: Author sort specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("author", { descending: true });
+        });
+    });
+    test("200: Title sort specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("title", { descending: true });
+        });
+    });
+  });
+  describe("Order to sort by specified order", () => {
+    test("200: Default sort_by category, but asc order specified", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
+    test("200: sort_by specified and asc order specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("votes", { ascending: true });
+        });
+    });
+    test("200: sort_by specified and desc order specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=desc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("title", { descending: true });
+        });
+    });
+  });
+
+  describe("Errors", () => {
+    test("400: Invalid sort_by category queried", () => {
+      return request(app)
+        .get("/api/articles?sort_by=invalidCategory")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Invalid order queried", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=invalidOrder")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("401: Existing sort category given, but not a valid option", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_img_url")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("400: Missing sort category", () => {
+      return request(app)
+        .get("/api/articles?sort_by=")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Missing order specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    /////ADD TO ENDPOINT JSON QUERIES
+  });
+});
