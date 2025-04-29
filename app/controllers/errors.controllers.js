@@ -1,7 +1,10 @@
 const handlePSQLErrors = (err, req, res, next) => {
-  // console.log(err, "error log");
+  console.log(err, "error log");
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid request!" });
+  }
+  if (err.code === "23503") {
+    res.status(401).send({ msg: "Unauthorised request!" });
   } else {
     next(err);
   }

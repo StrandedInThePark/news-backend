@@ -214,8 +214,8 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  describe("Errors", () => {
-    test.only("404: Specified article does not yet exist", () => {
+  describe.only("Errors", () => {
+    test("404: Specified article does not yet exist", () => {
       return request(app)
         .post("/api/articles/302/comments")
         .send({
@@ -227,7 +227,7 @@ describe("POST /api/articles/:article_id/comments", () => {
           expect(msg).toEqual("Not found!");
         });
     });
-    test.only("400: Invalid article id used", () => {
+    test("400: Invalid article id used", () => {
       return request(app)
         .post("/api/articles/invalidArticleId/comments")
         .send({
@@ -239,8 +239,40 @@ describe("POST /api/articles/:article_id/comments", () => {
           expect(msg).toEqual("Invalid request!");
         });
     });
-    test.todo("400: Not all keys present in comment object?");
-    test.todo("nothing in comment - reject");
-    test.todo("username does not exist - unauthorized 401?");
+    test("400: Not all keys present in comment object", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "lurker",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("400: Body of message is empty", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "lurker",
+          body: "",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Invalid request!");
+        });
+    });
+    test("401: Username does not exist - no account created", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "Springsteen49",
+          body: "Hey guys, I've announced 7 lost albums in June, head over to BTX for a laugh.",
+        })
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toEqual("Unauthorised request!");
+        });
+    });
   });
 });
