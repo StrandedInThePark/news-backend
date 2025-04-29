@@ -214,7 +214,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       });
   });
-  test.only("201: Comment posted if object has too many keys, but includes correct keys", () => {
+  test("201: Comment posted if object has too many keys, but includes correct keys", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
@@ -434,5 +434,23 @@ describe("GET /api/comments/:comment_id", () => {
           expect(msg).toBe("Invalid request!");
         });
     });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: Returns an array of user objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
   });
 });
