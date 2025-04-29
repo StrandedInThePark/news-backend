@@ -297,7 +297,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: -13 })
       .expect(200)
       .then(({ body: { updatedArticle } }) => {
-        console.log(updatedArticle, "updatedArticle");
         expect(updatedArticle).toMatchObject({
           article_id: 1,
           title: "Living in the shadow of a great man",
@@ -358,5 +357,75 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Unprocessable entity!");
       });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("200: Deletes specified comment", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toHaveLength(10);
+          });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Comment_id is valid but does not exist", () => {
+      return request(app)
+        .delete("/api/comments/203")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test("400: Invalid comment_id used", () => {
+      return request(app)
+        .delete("/api/comments/invalidCommentId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+  });
+});
+
+describe("GET /api/comments/:comment_id", () => {
+  test("200: Returns specified comment", () => {
+    return request(app)
+      .get("/api/comments/2")
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          comment_id: 2,
+          article_id: 1,
+          body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          votes: 14,
+          author: "butter_bridge",
+          created_at: "2020-10-31T03:03:00.000Z",
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Comment_id does not exist", () => {
+      return request(app)
+        .get("/api/comments/2000")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test("400: Invalid comment_id", () => {
+      return request(app)
+        .get("/api/comments/invalidCommentId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
   });
 });
