@@ -30,4 +30,14 @@ const insertCommentToArticle = (articleId, username, body) => {
   }
 };
 
-module.exports = { selectCommentsByArticleId, insertCommentToArticle };
+const modelDeleteCommentByCommentId = (commentId) => {
+  return db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [
+    commentId,
+  ]);
+};
+
+module.exports = {
+  selectCommentsByArticleId,
+  insertCommentToArticle,
+  modelDeleteCommentByCommentId,
+};

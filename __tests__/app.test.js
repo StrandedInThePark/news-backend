@@ -297,7 +297,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: -13 })
       .expect(200)
       .then(({ body: { updatedArticle } }) => {
-        console.log(updatedArticle, "updatedArticle");
         expect(updatedArticle).toMatchObject({
           article_id: 1,
           title: "Living in the shadow of a great man",
@@ -358,5 +357,26 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Unprocessable entity!");
       });
+  });
+});
+
+describe.only("DELETE /api/comments/:comment_id", () => {
+  test("200: Deletes specified comment", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toHaveLength(10);
+          });
+      });
+  });
+
+  describe.skip("Errors", () => {
+    test.todo("nonexistent comment id");
+    test.todo("invalid comment id");
   });
 });
