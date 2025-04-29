@@ -176,3 +176,48 @@ describe("GET /api/articles/:article_id/comments", () => {
     });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test.only("200: Adds comment to the specific article", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "lurker",
+        body: "Has anyone heard the rumours?",
+      })
+      .expect(200)
+      .then(() => {
+        return request(app)
+          .get("/api/articles/3/comments")
+          .expect(200)
+          .then(({ body: { comments } }) => {
+            expect(comments).toHaveLength(3);
+          });
+      });
+  });
+  test.only("200: Returns the comment", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "lurker",
+        body: "Has anyone heard the rumours?",
+      })
+      .expect(200)
+      .then(({ body: { newComment } }) => {
+        expect(newComment).toMatchObject({
+          comment_id: 19,
+          article_id: 3,
+          author: "lurker",
+          body: "Has anyone heard the rumours?",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  describe.skip("ERROR TESTS", () => {
+    test.todo("specified article does not exist");
+    test.todo("not all keys present in comment object?");
+    test.todo("nothing in comment - reject");
+    test.todo("username does not exist");
+  });
+});

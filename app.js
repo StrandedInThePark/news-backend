@@ -12,6 +12,7 @@ const {
 } = require("./app/controllers/articles.controllers");
 const {
   getCommentsByArticleId,
+  postCommentToArticle,
 } = require("./app/controllers/comments.controllers");
 const {
   handlePSQLErrors,
@@ -28,6 +29,8 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id", getArticleByArticleId);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.post("/api/articles/:article_id/comments", postCommentToArticle);
 
 app.all("/*splat", (req, res, next) => {
   res.status(404).send({ msg: "Invalid URL!" });
