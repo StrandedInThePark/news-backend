@@ -17,6 +17,7 @@ const {
   deleteCommentByCommentId,
   getCommentByCommentId,
 } = require("./app/controllers/comments.controllers");
+const { getAllUsers } = require("./app/controllers/users.controllers");
 const {
   handlePSQLErrors,
   handleCustomErrors,
@@ -40,6 +41,8 @@ app.patch("/api/articles/:article_id", patchVotesOnArticle);
 app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
 
 app.get("/api/comments/:comment_id", getCommentByCommentId);
+
+app.get("/api/users", getAllUsers);
 
 app.all("/*splat", (req, res, next) => {
   res.status(404).send({ msg: "Invalid URL!" });
