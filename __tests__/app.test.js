@@ -289,3 +289,31 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
   });
 });
+
+describe.only("PATCH /api/articles/:article_id", () => {
+  test("200: Updates specified article with new vote count", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -13 })
+      .expect(200)
+      .then(({ body: { updatedArticle } }) => {
+        console.log(updatedArticle, "updatedArticle");
+        expect(updatedArticle).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 87,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  describe.only("Errors", () => {
+    test.todo("400: Invalid article id used");
+    test.todo("no article exists but valid");
+    test.todo("");
+  });
+});

@@ -40,4 +40,19 @@ const selectAllArticles = () => {
     });
 };
 
-module.exports = { selectArticleByArticleId, selectAllArticles };
+const updateVotesOnArticle = (voteIncrement, articleId) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = (votes + $1) WHERE article_id = $2 RETURNING *`,
+      [voteIncrement, articleId]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+module.exports = {
+  selectArticleByArticleId,
+  selectAllArticles,
+  updateVotesOnArticle,
+};
