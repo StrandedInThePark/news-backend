@@ -30,7 +30,6 @@ describe("GET /* all other urls", () => {
       .get("/api/non-existent-endpoint")
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         expect(body.msg).toBe("Invalid URL!");
       });
   });
@@ -118,8 +117,62 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        console.log(articles, "articles");
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Retrieves all comments for specified article, in an array", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(2);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: Comments are ordered with most recent comments first", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  test("200: Article exists but there are no comments, receives empty array", () => {
+    return request(app)
+      .get("/api/articles/10/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([]);
+      });
+  });
+  describe("Errors", () => {
+    test("400: Invalid article ID; not a number", () => {
+      return request(app)
+        .get("/api/articles/not-a-number/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("404: Non-existent article ID; valid request", () => {
+      return request(app)
+        .get("/api/articles/1313/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
   });
 });
