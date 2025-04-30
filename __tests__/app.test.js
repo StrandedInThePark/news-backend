@@ -619,7 +619,7 @@ describe("GET /api/articles?topic query", () => {
         expect(articles).toBeSortedBy("title", { ascending: true });
       });
   });
-  test("200: Topic exists, but there are no articles under this topic", () => {
+  test("200: Topic exists, but there are no articles under this topic - serves an empty array", () => {
     return request(app)
       .get("/api/articles?topic=paper")
       .expect(200)
