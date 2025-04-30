@@ -466,16 +466,18 @@ describe("GET /api/articles?sort_by query", () => {
           //descending: newest date first
         });
     });
-    describe("Specified categories to sort by", () => {
-      test("200: Created_at sort specified", () => {
-        return request(app)
-          .get("/api/articles?sort_by=created_at")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).toBeSortedBy("created_at", { descending: true });
-          });
-      });
+  });
+
+  describe("Specified categories to sort by", () => {
+    test("200: Created_at sort specified", () => {
+      return request(app)
+        .get("/api/articles?sort_by=created_at")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
     });
+
     test("200: Votes sort specified", () => {
       return request(app)
         .get("/api/articles?sort_by=votes")
@@ -513,6 +515,14 @@ describe("GET /api/articles?sort_by query", () => {
     test("200: Default sort_by category, but asc order specified", () => {
       return request(app)
         .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
+    test("200: Handles upper case order query", () => {
+      return request(app)
+        .get("/api/articles?order=ASC")
         .expect(200)
         .then(({ body: { articles } }) => {
           expect(articles).toBeSortedBy("created_at", { ascending: true });
@@ -577,6 +587,62 @@ describe("GET /api/articles?sort_by query", () => {
           expect(msg).toBe("Invalid request!");
         });
     });
-    /////ADD TO ENDPOINT JSON QUERIES
+  });
+});
+
+describe("GET /api/articles?topic query", () => {
+  test("200: Serves array of articles filtered by the topic value specified in the query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(1);
+        expect(articles[0]).toMatchObject({
+          author: "rogersop",
+          title: "UNCOVERED: catspiracy to bring down democracy",
+          article_id: 5,
+          topic: "cats",
+          created_at: "2020-08-03T13:14:00.000Z",
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 2,
+        });
+      });
+  });
+  test("200: Handles all three at once: sort_by, topic and order queries - serves an array of articles filtered by the topic value and sorted/ordered when specified", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        expect(articles).toBeSortedBy("title", { ascending: true });
+      });
+  });
+  test("200: Topic exists, but there are no articles under this topic - serves an empty array", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(0);
+      });
+  });
+  describe("Errors", () => {
+    test("404: Valid topic query does not exist", () => {
+      return request(app)
+        .get("/api/articles?topic=topicDoesNotExist")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test("400: Empty topic query", () => {
+      return request(app)
+        .get("/api/articles?topic=")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
   });
 });
