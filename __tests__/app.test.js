@@ -646,3 +646,25 @@ describe("GET /api/articles?topic query", () => {
     });
   });
 });
+
+describe("GET /api/articles/:article_id feature update: include comment_count", () => {
+  test("200: Responds with an article object for given article id, including comment_count", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          article_id: 3,
+          title: "Eight pug gifs that remind me of mitch",
+          topic: "mitch",
+          author: "icellusedkars",
+          body: "some gifs",
+          created_at: `2020-11-03T09:12:00.000Z`,
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 2,
+        });
+      });
+  });
+});
