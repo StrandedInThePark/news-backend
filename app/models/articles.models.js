@@ -36,15 +36,19 @@ const selectAllArticles = (sort_by, order, topic) => {
 
   //topic query brought in here, need to do promise to check if it exists
 
+  //sort_by handling
   if (!sort_by) {
     queryStr += ` ORDER BY created_at`;
   }
-  if (sort_by && sortByGreenlist.includes(sort_by)) {
-    queryStr += ` ORDER BY ${sort_by}`;
+  if (sort_by) {
+    if (sortByGreenlist.includes(sort_by)) {
+      queryStr += ` ORDER BY ${sort_by}`;
+    }
+    if (sortByRedlist.includes(sort_by)) {
+      return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+    }
   }
-  if (sort_by && sortByRedlist.includes(sort_by)) {
-    return Promise.reject({ status: 401, msg: "Unauthorised request!" });
-  }
+  //400 reject
   if (
     (sort_by && !sortByGreenlist.includes(sort_by)) ||
     sort_by === "" ||
@@ -57,7 +61,7 @@ const selectAllArticles = (sort_by, order, topic) => {
   if (!order) {
     queryStr += ` DESC`;
   }
-  if (order && orderGreenlist.includes(order)) {
+  if (order && orderGreenlist.includes(order.toLowerCase())) {
     queryStr += ` ${order}`;
   }
 
