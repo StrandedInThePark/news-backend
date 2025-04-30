@@ -1,3 +1,5 @@
+const db = require("../../db/connection");
+
 const {
   selectArticleByArticleId,
   selectAllArticles,
@@ -15,23 +17,25 @@ const getArticleByArticleId = (req, res, next) => {
 
 const getAllArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
-  ////////
-  //check for topic existing
-  const selectTopicByTopic = (topicName) => {
+  //function to check topic existence - rejects if it does not
+  const checkTopicExists = (topicName) => {
     return db
       .query(`SELECT * FROM topics WHERE slug = $1`, [topicName])
       .then(({ rows }) => {
         if (rows.length === 0) {
-          Promise.reject();
+          return Promise.reject({ status: 404, msg: "Not found!" });
+        } else {
+          return true;
         }
-      });
+      })
+      .catch(next);
   };
-  ////////
-  // const pendingSelectAllArticles = selectAllArticles(sort_by, order, topic);
-  // const pendingSelectTopicByTopic = selectTopicByTopic(topic);
-  ///////
-
-  //moving model logic into controller
+  if (topic === "") {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
+  if (topic) {
+    checkTopicExists(topic);
+  }
   let queryStr = `WITH mainCommentsInfo AS
           (SELECT author, title, article_id, topic, created_at, votes, article_img_url
           FROM articles),
@@ -52,6 +56,10 @@ const getAllArticles = (req, res, next) => {
   const sortByGreenlist = ["created_at", "votes", "topic", "author", "title"];
   const orderGreenlist = ["asc", "desc"];
   const sortByRedlist = ["body", "article_img_url"];
+  //topic handling
+  if (topic) {
+    queryStr += ` WHERE topic = '${topic}'`;
+  }
   //sort_by handling
   if (!sort_by) {
     queryStr += ` ORDER BY created_at`;
@@ -80,9 +88,6 @@ const getAllArticles = (req, res, next) => {
   if (order && orderGreenlist.includes(order.toLowerCase())) {
     queryStr += ` ${order}`;
   }
-  ///////////end of model logic above
-
-  // Promise.all([pendingSelectAllArticles, pendingSelectTopicByTopic])
   return selectAllArticles(queryStr)
     .then((articles) => {
       res.status(200).send({ articles });
