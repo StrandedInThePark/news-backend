@@ -3,8 +3,11 @@ const express = require("express");
 
 const app = express();
 app.use(express.json());
-
-const getApi = require("./app/controllers/api.controllers");
+const apiRouter = require("./app/routes/api-router.js");
+app.use("/api", apiRouter);
+const articlesRouter = require("./app/routes/articles-router.js");
+app.use("/api/articles", articlesRouter);
+// const getApi = require("./app/controllers/api.controllers");
 const { getAllTopics } = require("./app/controllers/topics.controllers");
 const {
   getArticleByArticleId,
@@ -24,11 +27,11 @@ const {
   catchAllErrors,
 } = require("./app/controllers/errors.controllers");
 
-app.get("/api", getApi);
+// app.get("/api", getApi);
 
 app.get("/api/topics", getAllTopics);
 
-app.get("/api/articles", getAllArticles);
+// app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticleByArticleId);
 
