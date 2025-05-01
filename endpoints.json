@@ -135,10 +135,26 @@
       "updatedComment": {
         "comment_id": 2,
         "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
-        "created_at": "2020-10-31T03:03:00.000Z",
+        "created_at": "2025-10-31T03:03:00.000Z",
         "votes": 19,
         "author": "butter_bridge",
         "article_id": 1
+      }
+    }
+  },
+  "POST /api/articles": {
+    "description": "posts a new article",
+    "exampleResponse": {
+      "newArticle": {
+        "author": "lurker",
+        "title": "What was once lost has now been found",
+        "body": "Has anyone heard the rumours...who says my 90s output was poor?",
+        "topic": "paper",
+        "article_img_url": "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        "article_id": 14,
+        "votes": 0,
+        "comment_count": 0,
+        "created_at": "2024-11-31T03:03:00.000Z"
       }
     }
   }
