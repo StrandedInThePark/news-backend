@@ -18,7 +18,19 @@ const selectCommentByCommentId = (commentId) => {
     });
 };
 
+const updateVotesOnComment = (voteIncrement, commentId) => {
+  return db
+    .query(
+      `UPDATE comments SET votes = (votes + $1) WHERE comment_id = $2 RETURNING *`,
+      [voteIncrement, commentId]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
 module.exports = {
   modelDeleteCommentByCommentId,
   selectCommentByCommentId,
+  updateVotesOnComment,
 };

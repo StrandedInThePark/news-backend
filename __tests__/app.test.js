@@ -337,7 +337,6 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(msg).toBe("Invalid request!");
       });
   });
-
   test("400: Invalid vote modifier sent", () => {
     return request(app)
       .patch("/api/articles/1")
@@ -690,6 +689,73 @@ describe("GET /api/users/:username", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Not found!");
+        });
+    });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Updates specified comment with new vote count", () => {
+    return request(app)
+      .patch("/api/comments/2")
+      .send({ inc_votes: 5 })
+      .expect(200)
+      .then(({ body: { updatedComment } }) => {
+        expect(updatedComment).toMatchObject({
+          comment_id: 2,
+          body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          created_at: "2020-10-31T03:03:00.000Z",
+          votes: 19,
+          author: "butter_bridge",
+          article_id: 1,
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: No comment exists with comment_id requested", () => {
+      return request(app)
+        .patch("/api/comments/500")
+        .send({ inc_votes: -13 })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+
+    test("400: Invalid comment_id used", () => {
+      return request(app)
+        .patch("/api/comments/invalidCommentId")
+        .send({ inc_votes: -13 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Invalid vote modifier sent", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: "cat" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Incorrect key in patch request object", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ wrong_key: 5 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("422: Vote modifier of 0 sent; client alerted to unprocessable entity", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: 0 })
+        .expect(422)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unprocessable entity!");
         });
     });
   });
