@@ -973,3 +973,28 @@ describe("POST /api/articles", () => {
     });
   });
 });
+
+describe("GET /api/topics/:slug", () => {
+  test("200: Serves topic requested", () => {
+    return request(app)
+      .get("/api/topics/cats")
+      .expect(200)
+      .then(({ body: { topic } }) => {
+        expect(topic).toMatchObject({
+          slug: "cats",
+          description: "Not dogs",
+          img_url: "",
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Topic does not exist", () => {
+      return request(app)
+        .get("/api/topics/topicDoesNotExist")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+  });
+});
