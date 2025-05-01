@@ -668,3 +668,29 @@ describe("GET /api/articles/:article_id feature update: include comment_count", 
       });
   });
 });
+
+describe("GET /api/users/:username", () => {
+  test("200: Serves a user object for the requested username", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .expect(200)
+      .then(({ body: { user } }) => {
+        expect(user).toMatchObject({
+          username: "rogersop",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+          name: "paul",
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Username requested does not exist", () => {
+      return request(app)
+        .get("/api/users/brucespringsteen")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+  });
+});
