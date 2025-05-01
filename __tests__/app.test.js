@@ -760,3 +760,216 @@ describe("PATCH /api/comments/:comment_id", () => {
     });
   });
 });
+
+describe("POST /api/articles", () => {
+  test("201: Adds a new article", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "What was once lost has now been found",
+        body: "Has anyone heard the rumours...who says my 90s output was poor?",
+        topic: "paper",
+        article_img_url:
+          "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+      })
+      .expect(201)
+      .then(() => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(14);
+          });
+      });
+  });
+  test("201: Returns the article", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "What was once lost has now been found",
+        body: "Has anyone heard the rumours...who says my 90s output was poor?",
+        topic: "paper",
+        article_img_url:
+          "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+      })
+      .expect(201)
+      .then(({ body: { newArticle } }) => {
+        expect(newArticle).toMatchObject({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+          article_id: 14,
+          votes: 0,
+          comment_count: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("201: Article posted if object has too many keys, but includes correct keys", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "What was once lost has now been found",
+        body: "Has anyone heard the rumours...who says my 90s output was poor?",
+        topic: "paper",
+        article_img_url:
+          "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        extraKey: "extraString",
+      })
+      .expect(201)
+      .then(({ body: { newArticle } }) => {
+        expect(newArticle).toMatchObject({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+          article_id: 14,
+          votes: 0,
+          comment_count: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("201: article_img_url not required to post a new article", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        title: "What was once lost has now been found",
+        body: "Has anyone heard the rumours...who says my 90s output was poor?",
+        topic: "paper",
+      })
+      .expect(201)
+      .then(({ body: { newArticle } }) => {
+        expect(newArticle).toMatchObject({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_id: 14,
+          votes: 0,
+          comment_count: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("400: Not all keys present in article object", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "lurker",
+          title: "What was once lost has now been found",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Body is empty", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Title is empty", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "lurker",
+          title: "",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("401: Username does not exist - no account created", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "BSpringsteen49",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("400: Author is empty", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "paper",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Topic is empty", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+
+    test("401: Topic does not exist yet", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          author: "lurker",
+          title: "What was once lost has now been found",
+          body: "Has anyone heard the rumours...who says my 90s output was poor?",
+          topic: "Springsteen",
+          article_img_url:
+            "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg",
+        })
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+  });
+});

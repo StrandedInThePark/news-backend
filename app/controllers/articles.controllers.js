@@ -6,6 +6,7 @@ const {
   updateVotesOnArticle,
   selectCommentsByArticleId,
   insertCommentToArticle,
+  insertNewArticle,
 } = require("../models/articles.models");
 
 const getArticleByArticleId = (req, res, next) => {
@@ -145,10 +146,23 @@ const getCommentsByArticleId = (req, res, next) => {
     .catch(next);
 };
 
+const postNewArticle = (req, res, next) => {
+  const { author, title, body, topic, article_img_url } = req.body;
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
+  return insertNewArticle(author, title, body, topic, article_img_url)
+    .then((newArticle) => {
+      res.status(201).send({ newArticle });
+    })
+    .catch(next);
+};
+
 module.exports = {
   getArticleByArticleId,
   getAllArticles,
   patchVotesOnArticle,
   postCommentToArticle,
   getCommentsByArticleId,
+  postNewArticle,
 };

@@ -4,20 +4,20 @@ const selectArticleByArticleId = (articleId) => {
   return db
     .query(
       `WITH mainArticlesInfo AS
-(SELECT *
-FROM articles
-WHERE article_id = $1
-),
+      (SELECT *
+      FROM articles
+      WHERE article_id = $1
+      ),
 
-commentCountInfo AS
-(SELECT article_id, COUNT(comment_id)::INT
-AS comment_count
-FROM comments
-GROUP BY article_id)
+      commentCountInfo AS
+      (SELECT article_id, COUNT(comment_id)::INT
+      AS comment_count
+      FROM comments
+      GROUP BY article_id)
 
-SELECT mainArticlesInfo.*, COALESCE(commentCountInfo.comment_count, 0) AS comment_count FROM mainArticlesInfo
+      SELECT mainArticlesInfo.*, COALESCE(commentCountInfo.comment_count, 0) AS comment_count FROM mainArticlesInfo
 
-LEFT JOIN commentCountInfo ON mainArticlesInfo.article_id = commentCountInfo.article_id`,
+      LEFT JOIN commentCountInfo ON mainArticlesInfo.article_id = commentCountInfo.article_id`,
       [articleId]
     )
     .then(({ rows }) => {
@@ -76,10 +76,45 @@ const insertCommentToArticle = (articleId, username, body) => {
   }
 };
 
+const insertNewArticle = (author, title, body, topic, article_img_url) => {
+  return db
+    .query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) 
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING article_id`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      const articleId = rows[0].article_id;
+      return db.query(
+        `WITH mainArticlesInfo AS
+      (SELECT *
+      FROM articles
+      WHERE article_id = $1
+      ),
+
+      commentCountInfo AS
+      (SELECT article_id, COUNT(comment_id)::INT
+      AS comment_count
+      FROM comments
+      GROUP BY article_id)
+
+      SELECT mainArticlesInfo.*, COALESCE(commentCountInfo.comment_count, 0) AS comment_count FROM mainArticlesInfo
+
+      LEFT JOIN commentCountInfo ON mainArticlesInfo.article_id = commentCountInfo.article_id`,
+        [articleId]
+      );
+    })
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
 module.exports = {
   selectArticleByArticleId,
   selectAllArticles,
   updateVotesOnArticle,
   selectCommentsByArticleId,
   insertCommentToArticle,
+  insertNewArticle,
 };
