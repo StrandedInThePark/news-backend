@@ -316,53 +316,54 @@ describe("PATCH /api/articles/:article_id", () => {
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         });
       });
-  });
-  describe("Errors", () => {
-    test("404: No article exists with article_id requested", () => {
+
+    describe("Errors", () => {
+      test("404: No article exists with article_id requested", () => {
+        return request(app)
+          .patch("/api/articles/500")
+          .send({ inc_votes: -13 })
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Not found!");
+          });
+      });
+    });
+    test("400: Invalid article id used", () => {
       return request(app)
-        .patch("/api/articles/500")
+        .patch("/api/articles/invalidArticleId")
         .send({ inc_votes: -13 })
-        .expect(404)
+        .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Not found!");
+          expect(msg).toBe("Invalid request!");
         });
     });
-  });
-  test("400: Invalid article id used", () => {
-    return request(app)
-      .patch("/api/articles/invalidArticleId")
-      .send({ inc_votes: -13 })
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid request!");
-      });
-  });
-  test("400: Invalid vote modifier sent", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: "cat" })
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid request!");
-      });
-  });
-  test("400: Incorrect key in patch request object", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ wrong_key: 5 })
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Invalid request!");
-      });
-  });
-  test("422: Vote modifier of 0 sent; client alerted to unprocessable entity", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: 0 })
-      .expect(422)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Unprocessable entity!");
-      });
+    test("400: Invalid vote modifier sent", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "cat" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Incorrect key in patch request object", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ wrong_key: 5 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("422: Vote modifier of 0 sent; client alerted to unprocessable entity", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 0 })
+        .expect(422)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unprocessable entity!");
+        });
+    });
   });
 });
 
