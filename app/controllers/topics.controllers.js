@@ -6,4 +6,4 @@ const getAllTopics = (req, res, next) => {
   });
 };
 
-module.exports = { getAllTopics };
+module.exports = getAllTopics;
