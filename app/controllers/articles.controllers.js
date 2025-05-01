@@ -33,9 +33,7 @@ const getAllArticles = (req, res, next) => {
       })
       .catch(next);
   };
-  if (topic === "") {
-    return Promise.reject({ status: 400, msg: "Invalid request!" });
-  }
+
   if (topic) {
     checkTopicExists(topic);
   }
@@ -80,10 +78,12 @@ const getAllArticles = (req, res, next) => {
     (sort_by && !sortByGreenlist.includes(sort_by)) ||
     sort_by === "" ||
     (order && !orderGreenlist.includes(order.toLowerCase())) ||
-    order === ""
+    order === "" ||
+    topic === ""
   ) {
     return Promise.reject({ status: 400, msg: "Invalid request!" });
   }
+
   //order handling
   if (!order) {
     queryStr += ` DESC`;
