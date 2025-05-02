@@ -7,7 +7,7 @@
 
 >[!NOTE]
 >### To run this on your local machine:
->- You must have Node.js version 22.13.1 installed, and Postgres version 8.13.3 installed.
+>- You must have Node.js version `22.13.1` installed, and Postgres version `8.13.3` installed.
 ---
 - Fork this repo, and clone it to your local machine.
 - To install dependencies, from your CLI, run:<br>
