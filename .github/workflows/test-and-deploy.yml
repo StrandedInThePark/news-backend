@@ -1,0 +1,40 @@
+name: Test & Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    #lint:
+    #name: Lint
+    #runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        # uses: StrandedInThePark/nc-news-backend@main
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+
+      - name: Use PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql db: "nc_news_test"
+          postgresql user: "test_user3"
+          postgresql password: "test_password3"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: PGDATABASE=nc_news_test PGUSER=test_user3 PGPASSWORD=test_password3 npm t
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test #needs to run test job successfully before deploy will run
+    steps:
+      - name: Deploy to Render
+        run: curl $\{{ secrets.https://api.render.com/deploy/srv-d092kus9c44c73acftog?key=BZAwSKrb6Dk }}
