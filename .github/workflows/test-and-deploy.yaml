@@ -36,4 +36,4 @@ jobs:
     needs: test #needs to run test job successfully before deploy will run
     steps:
       - name: Deploy to Render
-        run: curl $ {{ secrets.SECRET_DEPLOY_URL }}
+        run: curl ${{ secrets.SECRET_DEPLOY_URL }}
