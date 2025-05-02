@@ -1,4 +1,4 @@
-# nc-news-backend
+# news-backend
 ### This is a backend app developed using TDD, including a database and a hosted api server.
 
 ### This app is hosted by Render, and a description of available endpoints can be seen here: 
