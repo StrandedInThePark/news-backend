@@ -2,7 +2,7 @@
 ### This is a backend app developed using TDD, including a database and a hosted api server.
 
 ### This app is hosted by Render, and a description of available endpoints can be seen here: 
-[Online app](https://nc-news-api-host.onrender.com/api) (this service may take ~1 min to spin up). 
+[Online app](https://news-api.onrender.com/api) (this service may take ~1 min to spin up). 
 ---
 
 >[!NOTE]
