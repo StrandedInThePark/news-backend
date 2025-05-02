@@ -586,6 +586,22 @@ describe("GET /api/articles?sort_by query", () => {
           expect(msg).toBe("Invalid request!");
         });
     });
+    test("400: Misspelt 'sort_by'", () => {
+      return request(app)
+        .get("/api/articles?sort_bye=votes")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid or misspelt query parameter!");
+        });
+    });
+    test("400: Misspelt 'order'", () => {
+      return request(app)
+        .get("/api/articles?orderrrr=ASC")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid or misspelt query parameter!");
+        });
+    });
   });
 });
 
@@ -641,6 +657,14 @@ describe("GET /api/articles?topic query", () => {
         .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Misspelt 'topic'", () => {
+      return request(app)
+        .get("/api/articles?topik=cats")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid or misspelt query parameter!");
         });
     });
   });
