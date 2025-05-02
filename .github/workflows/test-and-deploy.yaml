@@ -37,5 +37,5 @@ jobs:
     steps:
       - name: Deploy to Render
         env:
-          deploy_url: $\{{ secrets.https://api.render.com/deploy/srv-d092kus9c44c73acftog?key=BZAwSKrb6Dk }}
+          deploy_url: ${{ secrets.https://api.render.com/deploy/srv-d092kus9c44c73acftog?key=BZAwSKrb6Dk }}
         run: curl "$deploy_url"
