@@ -29,7 +29,7 @@ const selectArticleByArticleId = (articleId) => {
     });
 };
 
-const selectAllArticles = (sort_by, order, topic) => {
+const selectAllArticles = (sort_by, order, topic, limit = 10, p) => {
   let queryStr = `WITH mainCommentsInfo AS
   (SELECT author, title, article_id, topic, created_at, votes, article_img_url
   FROM articles),
@@ -83,8 +83,26 @@ const selectAllArticles = (sort_by, order, topic) => {
   if (order && orderGreenlist.includes(order.toLowerCase())) {
     queryStr += ` ${order}`;
   }
-
+  //greenlist limit and p as numbers
+  if (limit) {
+    if (isNaN(limit) || limit < 1) {
+      return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+    }
+  }
+  if (p) {
+    if (isNaN(p) || p < 0) {
+      return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+    }
+  }
+  queryStr += ` LIMIT ${limit}`; //set results limit per page
+  if (p) {
+    let offSetRows = limit * (p - 1); //select start page
+    queryStr += ` OFFSET ${offSetRows}`;
+  }
   return db.query(queryStr).then(({ rows: articles }) => {
+    if (articles.length === 0 && p > 0) {
+      return Promise.reject({ status: 404, msg: "This page does not exist!" });
+    } //if page too high for results, reject
     return articles;
   });
 };
