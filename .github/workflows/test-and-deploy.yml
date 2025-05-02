@@ -13,7 +13,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        # uses: StrandedInThePark/nc-news-backend@main
 
       - name: Use Node.js
         uses: actions/setup-node@v4
