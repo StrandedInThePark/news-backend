@@ -18,8 +18,8 @@ const getArticleByArticleId = (req, res, next) => {
 };
 
 const getAllArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
-  const allowedKeys = ["sort_by", "order", "topic"];
+  const { sort_by, order, topic, limit, p } = req.query;
+  const allowedKeys = ["sort_by", "order", "topic", "limit", "p"];
   const invalidKeys = Object.keys(req.query).some(
     (key) => !allowedKeys.includes(key)
   );
@@ -32,7 +32,13 @@ const getAllArticles = (req, res, next) => {
 
   if (topic) {
     const pendingSelectTopicBySlug = selectTopicBySlug(topic);
-    const pendingSelectAllArticles = selectAllArticles(sort_by, order, topic);
+    const pendingSelectAllArticles = selectAllArticles(
+      sort_by,
+      order,
+      topic,
+      limit,
+      p
+    );
     return Promise.all([pendingSelectAllArticles, pendingSelectTopicBySlug])
       .then((articles) => {
         res.status(200).send({ articles: articles[0] });
@@ -40,7 +46,7 @@ const getAllArticles = (req, res, next) => {
       .catch(next);
   }
   if (!topic) {
-    return selectAllArticles(sort_by, order, topic)
+    return selectAllArticles(sort_by, order, topic, limit, p)
       .then((articles) => {
         res.status(200).send({ articles });
       })

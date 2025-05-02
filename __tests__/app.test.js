@@ -94,7 +94,7 @@ describe("GET /api/articles/:article_id", () => {
 describe("GET /api/articles", () => {
   test("200: Responds with an array of all articles as objects", () => {
     return request(app)
-      .get("/api/articles")
+      .get("/api/articles?limit=20") //set limit due to later pagination feature
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(13);
@@ -627,7 +627,7 @@ describe("GET /api/articles?topic query", () => {
   });
   test("200: Handles all three at once: sort_by, topic and order queries - serves an array of articles filtered by the topic value and sorted/ordered when specified", () => {
     return request(app)
-      .get("/api/articles?topic=mitch&sort_by=title&order=asc")
+      .get("/api/articles?topic=mitch&sort_by=title&order=asc&limit=20") //set higher limit due to later pagination feature
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(12);
@@ -800,7 +800,7 @@ describe("POST /api/articles", () => {
       .expect(201)
       .then(() => {
         return request(app)
-          .get("/api/articles")
+          .get("/api/articles?limit=20") //set higher limit due to later pagination feature
           .expect(200)
           .then(({ body: { articles } }) => {
             expect(articles).toHaveLength(14);
@@ -1018,6 +1018,121 @@ describe("GET /api/topics/:slug", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Not found!");
+        });
+    });
+  });
+});
+
+describe("GET /api/articles (pagination)", () => {
+  test("200: Serves articles pagination according to limit", () => {
+    return request(app)
+      .get("/api/articles?limit=9")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(9);
+        articles.forEach((article) =>
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
+        );
+      });
+  });
+  test("200: Serves articles pagination according to limit and start page of 1", () => {
+    return request(app)
+      .get("/api/articles?limit=9&p=1")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(9);
+        articles.forEach((article) =>
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
+        );
+      });
+  });
+
+  test("200: Serves articles pagination according to limit and start page greater than 1", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=3")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(3); //13 test articles =>page 3 should have 3
+        articles.forEach((article) =>
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
+        );
+      });
+  });
+
+  describe("Errors", () => {
+    test("400: Limit misspelt", () => {
+      return request(app)
+        .get("/api/articles?limmit=3")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid or misspelt query parameter!");
+        });
+    });
+    test("401: Invalid p; not a number", () => {
+      return request(app)
+        .get("/api/articles?p=notANumber")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid p; less than 0", () => {
+      return request(app)
+        .get("/api/articles?p=-2")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid limit; not a number", () => {
+      return request(app)
+        .get("/api/articles?limit=notANumber")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid limit; less than 1", () => {
+      return request(app)
+        .get("/api/articles?limit=0")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("404: Page out of range of results", () => {
+      return request(app)
+        .get("/api/articles?limit=5&p=20")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("This page does not exist!");
         });
     });
   });
