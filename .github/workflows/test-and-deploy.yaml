@@ -36,6 +36,4 @@ jobs:
     needs: test #needs to run test job successfully before deploy will run
     steps:
       - name: Deploy to Render
-        env:
-          deploy_url: ${{ secrets.https://api.render.com/deploy/srv-d092kus9c44c73acftog?key=BZAwSKrb6Dk }}
-        run: curl "$deploy_url"
+        run: curl ${ { secrets.https://api.render.com/deploy/srv-d092kus9c44c73acftog?key=BZAwSKrb6Dk} }
