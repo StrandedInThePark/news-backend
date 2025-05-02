@@ -19,6 +19,16 @@ const getArticleByArticleId = (req, res, next) => {
 
 const getAllArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
+  const allowedKeys = ["sort_by", "order", "topic"];
+  const invalidKeys = Object.keys(req.query).some(
+    (key) => !allowedKeys.includes(key)
+  );
+  if (invalidKeys) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid or misspelt query parameter!",
+    });
+  }
 
   if (topic) {
     const pendingSelectTopicBySlug = selectTopicBySlug(topic);
@@ -29,7 +39,6 @@ const getAllArticles = (req, res, next) => {
       })
       .catch(next);
   }
-
   if (!topic) {
     return selectAllArticles(sort_by, order, topic)
       .then((articles) => {
