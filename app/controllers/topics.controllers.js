@@ -1,6 +1,7 @@
 const {
   selectAllTopics,
   selectTopicBySlug,
+  insertNewTopic,
 } = require("../models/topics.models");
 
 const getAllTopics = (req, res, next) => {
@@ -20,4 +21,16 @@ const getTopicBySlug = (req, res, next) => {
     .catch(next);
 };
 
-module.exports = { getAllTopics, getTopicBySlug };
+const postNewTopic = (req, res, next) => {
+  const { slug, description } = req.body;
+  if (!slug || !description) {
+    return Promise.reject({ status: 400, msg: "Invalid request!" });
+  }
+  return insertNewTopic(slug, description)
+    .then((newTopic) => {
+      res.status(201).send({ newTopic });
+    })
+    .catch(next);
+};
+
+module.exports = { getAllTopics, getTopicBySlug, postNewTopic };

@@ -18,4 +18,17 @@ const selectTopicBySlug = (slug) => {
     });
 };
 
-module.exports = { selectAllTopics, selectTopicBySlug };
+const insertNewTopic = (slug, description) => {
+  return db
+    .query(
+      `INSERT INTO topics (slug, description)
+    VALUES ($1, $2)
+    RETURNING *`,
+      [slug, description]
+    )
+    .then(({ rows: newTopic }) => {
+      return newTopic[0];
+    });
+};
+
+module.exports = { selectAllTopics, selectTopicBySlug, insertNewTopic };
