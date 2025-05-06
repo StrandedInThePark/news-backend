@@ -169,5 +169,15 @@
         "img_url": "img-url.org/imageofCats"
       }
     }
+  },
+  "POST /api/topics": {
+    "description": "adds a new topic",
+    "exampleResponse": {
+      "newTopic": {
+        "slug": "Bruce Springsteen",
+        "description": "All things boss",
+        "article_img_url": "https://cdn-p.smehost.net/sites/e8622626f9584d40b1a8fce8dfa6f567/wp-content/uploads/2025/04/250402-lostbox-cover-feat.jpg"
+      }
+    }
   }
 }
