@@ -90,7 +90,7 @@ const selectAllArticles = (sort_by, order, topic, limit = 10, p) => {
     }
   }
   if (p) {
-    if (isNaN(p) || p < 0) {
+    if (isNaN(p) || p < 1) {
       return Promise.reject({ status: 401, msg: "Unauthorised request!" });
     }
   }
