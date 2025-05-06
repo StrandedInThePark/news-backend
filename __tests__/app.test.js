@@ -1137,3 +1137,47 @@ describe("GET /api/articles (pagination)", () => {
     });
   });
 });
+
+describe("POST /api/topics", () => {
+  test("201: Creates a new topic and returns the new topic object", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "Bruce Springsteen",
+        description: "All boss things",
+      })
+      .expect(201)
+      .then(({ body: { newTopic } }) => {
+        expect(newTopic).toMatchObject({
+          slug: "Bruce Springsteen",
+          img_url: null,
+          description: "All boss things",
+        });
+      });
+  });
+  describe("Errors", () => {
+    test("400: A key is missing from the body sent", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({
+          slug: "Bruce Springsteen",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+    test("400: Description or slug value is empty", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({
+          description: "",
+          slug: "Bruce Springsteen",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
+        });
+    });
+  });
+});
