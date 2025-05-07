@@ -17,7 +17,7 @@
       "order": "descending",
       "topic": "no default exists",
       "limit": 10,
-      "p": 0
+      "p": 1
     },
     "exampleResponse": {
       "articles": [
@@ -50,6 +50,11 @@
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for the article requested",
+    "queries": ["limit", "p"],
+    "query defaults": {
+      "limit": 10,
+      "p": 1
+    },
     "exampleResponse": [
       {
         "comment_id": 14,

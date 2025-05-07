@@ -93,8 +93,25 @@ const postCommentToArticle = (req, res, next) => {
 
 const getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const { limit, p } = req.query;
+
+  const allowedKeys = ["limit", "p"];
+  const invalidKeys = Object.keys(req.query).some(
+    (key) => !allowedKeys.includes(key)
+  );
+  if (invalidKeys) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid or misspelt query parameter!",
+    });
+  }
+
   const pendingArticleById = selectArticleByArticleId(article_id);
-  const pendingSelectCommentsById = selectCommentsByArticleId(article_id);
+  const pendingSelectCommentsById = selectCommentsByArticleId(
+    article_id,
+    limit,
+    p
+  );
   Promise.all([pendingSelectCommentsById, pendingArticleById]) //result promise first, validity check promise second
     .then(([comments]) => {
       res.status(200).send({ comments });

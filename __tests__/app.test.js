@@ -1065,7 +1065,7 @@ describe("GET /api/articles (pagination)", () => {
       });
   });
 
-  test("200: Serves articles pagination according to limit and start page greater than 1", () => {
+  test("200: Serves articles paginated according to limit and start page greater than or equal to 1", () => {
     return request(app)
       .get("/api/articles?limit=5&p=3")
       .expect(200)
@@ -1103,9 +1103,9 @@ describe("GET /api/articles (pagination)", () => {
           expect(msg).toBe("Unauthorised request!");
         });
     });
-    test("401: Invalid p; less than 0", () => {
+    test("401: Invalid p; less than 1", () => {
       return request(app)
-        .get("/api/articles?p=-2")
+        .get("/api/articles?p=0")
         .expect(401)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Unauthorised request!");
@@ -1177,6 +1177,78 @@ describe("POST /api/topics", () => {
         .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Invalid request!");
+        });
+    });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments (pagination)", () => {
+  test("200: Serves comments paginated according to limit and start page greater than or equal to 1", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=3")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toHaveLength(1); //11 test comments =>page 3 should have 3
+        comments.forEach((comment) =>
+          expect(comment).toMatchObject({
+            author: expect.any(String),
+            comment_id: expect.any(Number),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
+      });
+  });
+
+  describe("Errors", () => {
+    test("400: Limit misspelt", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limmit=3")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid or misspelt query parameter!");
+        });
+    });
+    test("401: Invalid p; not a number", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=notANumber")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid p; less than 1", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=-2")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid limit; not a number", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=notANumber")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("401: Invalid limit; less than 1", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=0")
+        .expect(401)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Unauthorised request!");
+        });
+    });
+    test("404: Page out of range of results", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=5&p=20")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("This page does not exist!");
         });
     });
   });
