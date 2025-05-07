@@ -136,7 +136,6 @@ const deleteArticleById = (req, res, next) => {
   const { article_id } = req.params;
   const pendingSelectArticleByArticleId = selectArticleByArticleId(article_id);
   const pendingModelDeleteArticleById = modelDeleteArticleById(article_id);
-
   Promise.all([pendingModelDeleteArticleById, pendingSelectArticleByArticleId])
     .then(() => {
       res.status(204).send();
