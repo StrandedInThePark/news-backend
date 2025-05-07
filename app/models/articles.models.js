@@ -197,6 +197,13 @@ const insertNewArticle = (author, title, body, topic, article_img_url) => {
     });
 };
 
+const modelDeleteArticleById = (articleId) => {
+  return db.query(
+    `DELETE FROM articles
+    WHERE article_id = $1 RETURNING *`,
+    [articleId]
+  );
+};
 module.exports = {
   selectArticleByArticleId,
   selectAllArticles,
@@ -204,4 +211,5 @@ module.exports = {
   selectCommentsByArticleId,
   insertCommentToArticle,
   insertNewArticle,
+  modelDeleteArticleById,
 };
