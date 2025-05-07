@@ -118,17 +118,32 @@ const updateVotesOnArticle = (voteIncrement, articleId) => {
     });
 };
 
-const selectCommentsByArticleId = (articleId) => {
-  return db
-    .query(
-      `SELECT * FROM comments 
+const selectCommentsByArticleId = (articleId, limit = 10, p) => {
+  let queryStr = `SELECT * FROM comments 
         WHERE article_id = $1
-        ORDER BY created_at ASC`,
-      [articleId]
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+        ORDER BY created_at ASC`;
+
+  if (limit) {
+    if (isNaN(limit) || limit < 1) {
+      return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+    }
+  }
+  if (p) {
+    if (isNaN(p) || p < 1) {
+      return Promise.reject({ status: 401, msg: "Unauthorised request!" });
+    }
+  }
+  queryStr += ` LIMIT ${limit}`; //set results limit per page
+  if (p) {
+    let offSetRows = limit * (p - 1); //select start page
+    queryStr += ` OFFSET ${offSetRows}`;
+  }
+  return db.query(queryStr, [articleId]).then(({ rows: articles }) => {
+    if (articles.length === 0 && p > 0) {
+      return Promise.reject({ status: 404, msg: "This page does not exist!" });
+    } //if page too high for results, reject
+    return articles;
+  });
 };
 
 const insertCommentToArticle = (articleId, username, body) => {
