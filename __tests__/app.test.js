@@ -367,7 +367,7 @@ describe("PATCH /api/articles/:article_id", () => {
 });
 
 describe("DELETE /api/comments/:comment_id", () => {
-  test("200: Deletes specified comment", () => {
+  test("204: Deletes specified comment", () => {
     return request(app)
       .delete("/api/comments/2")
       .expect(204)
@@ -1249,6 +1249,40 @@ describe("GET /api/articles/:article_id/comments (pagination)", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("This page does not exist!");
+        });
+    });
+  });
+});
+
+describe("DELETE /api/articles/:article_id", () => {
+  test("204: Deletes specified article", () => {
+    return request(app)
+      .delete("/api/articles/2")
+      .expect(204)
+      .then(() => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toHaveLength(10);
+          });
+      });
+  });
+  describe("Errors", () => {
+    test("404: Article_id is valid but does not exist", () => {
+      return request(app)
+        .delete("/api/articles/203")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not found!");
+        });
+    });
+    test("400: Invalid article_id used", () => {
+      return request(app)
+        .delete("/api/articles/invalidArticleId")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid request!");
         });
     });
   });
