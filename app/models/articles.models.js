@@ -47,7 +47,14 @@ const selectAllArticles = (sort_by, order, topic, limit = 10, p) => {
 
   LEFT JOIN commentCountInfo 
   ON mainCommentsInfo.article_id = commentCountInfo.article_id`;
-  const sortByGreenlist = ["created_at", "votes", "topic", "author", "title"];
+  const sortByGreenlist = [
+    "created_at",
+    "votes",
+    "topic",
+    "author",
+    "title",
+    "comment_count",
+  ];
   const orderGreenlist = ["asc", "desc"];
   const sortByRedlist = ["body", "article_img_url"];
   //topic handling
