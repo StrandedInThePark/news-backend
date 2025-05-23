@@ -128,7 +128,7 @@ const updateVotesOnArticle = (voteIncrement, articleId) => {
 const selectCommentsByArticleId = (articleId, limit = 10, p) => {
   let queryStr = `SELECT * FROM comments 
         WHERE article_id = $1
-        ORDER BY created_at ASC`;
+        ORDER BY created_at DESC`;
 
   if (limit) {
     if (isNaN(limit) || limit < 1) {

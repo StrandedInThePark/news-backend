@@ -146,7 +146,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/5/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments).toBeSortedBy("created_at", { ascending: true });
+        expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("200: Article exists but there are no comments, receives empty array", () => {
